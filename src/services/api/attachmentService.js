@@ -1,48 +1,238 @@
-import attachmentsData from '../mockData/attachments.json'
-
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
-
-let attachments = [...attachmentsData]
+import { toast } from 'react-toastify';
 
 const attachmentService = {
   async getAll() {
-    await delay(300)
-    return [...attachments]
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        "Fields": [
+          { "Field": { "Name": "Id" } },
+          { "Field": { "Name": "Name" } },
+          { "Field": { "Name": "Tags" } },
+          { "Field": { "Name": "Owner" } },
+          { "Field": { "Name": "CreatedOn" } },
+          { "Field": { "Name": "CreatedBy" } },
+          { "Field": { "Name": "ModifiedOn" } },
+          { "Field": { "Name": "ModifiedBy" } },
+          { "Field": { "Name": "task_id" } },
+          { "Field": { "Name": "size" } },
+          { "Field": { "Name": "type" } },
+          { "Field": { "Name": "uploaded_by" } }
+        ]
+      };
+
+      const response = await apperClient.fetchRecords("Attachment1", params);
+
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return [];
+      }
+
+      // Transform data to match UI expectations
+      const transformedData = (response.data || []).map(attachment => ({
+        ...attachment,
+        id: attachment.Id,
+        name: attachment.Name,
+        taskId: attachment.task_id,
+        uploadedBy: attachment.uploaded_by
+      }));
+
+      return transformedData;
+    } catch (error) {
+      console.error("Error fetching attachments:", error);
+      throw error;
+    }
   },
 
   async getById(id) {
-    await delay(200)
-    const attachment = attachments.find(a => a.id === id)
-    if (!attachment) {
-      throw new Error('Attachment not found')
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        fields: ["Id", "Name", "Tags", "Owner", "CreatedOn", "CreatedBy", "ModifiedOn", "ModifiedBy", "task_id", "size", "type", "uploaded_by"]
+      };
+
+      const response = await apperClient.getRecordById("Attachment1", id, params);
+
+      if (!response || !response.data) {
+        throw new Error('Attachment not found');
+      }
+
+      // Transform data to match UI expectations
+      const attachment = response.data;
+      return {
+        ...attachment,
+        id: attachment.Id,
+        name: attachment.Name,
+        taskId: attachment.task_id,
+        uploadedBy: attachment.uploaded_by
+      };
+    } catch (error) {
+      console.error(`Error fetching attachment with ID ${id}:`, error);
+      throw error;
     }
-    return { ...attachment }
   },
 
   async getByTaskId(taskId) {
-    await delay(250)
-    return attachments.filter(a => a.taskId === taskId).map(a => ({ ...a }))
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        "Fields": [
+          { "Field": { "Name": "Id" } },
+          { "Field": { "Name": "Name" } },
+          { "Field": { "Name": "task_id" } },
+          { "Field": { "Name": "size" } },
+          { "Field": { "Name": "type" } },
+          { "Field": { "Name": "uploaded_by" } }
+        ],
+        "where": [
+          {
+            "FieldName": "task_id",
+            "Operator": "ExactMatch",
+            "Values": [taskId.toString()]
+          }
+        ]
+      };
+
+      const response = await apperClient.fetchRecords("Attachment1", params);
+
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      // Transform data to match UI expectations
+      const transformedData = (response.data || []).map(attachment => ({
+        ...attachment,
+        id: attachment.Id,
+        name: attachment.Name,
+        taskId: attachment.task_id,
+        uploadedBy: attachment.uploaded_by
+      }));
+
+      return transformedData;
+    } catch (error) {
+      console.error("Error fetching attachments by task:", error);
+      return [];
+    }
   },
 
   async create(attachmentData) {
-    await delay(400)
-    const newAttachment = {
-      ...attachmentData,
-      id: Date.now().toString()
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        records: [{
+          Name: attachmentData.name,
+          Tags: "",
+          Owner: attachmentData.uploadedBy,
+          task_id: parseInt(attachmentData.taskId),
+          size: parseInt(attachmentData.size),
+          type: attachmentData.type,
+          uploaded_by: attachmentData.uploadedBy
+        }]
+      };
+
+      const response = await apperClient.createRecord("Attachment1", params);
+
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return null;
+      }
+
+      if (response.results) {
+        const successfulRecords = response.results.filter(result => result.success);
+        const failedRecords = response.results.filter(result => !result.success);
+
+        if (failedRecords.length > 0) {
+          console.error(`Failed to create ${failedRecords.length} attachments:${JSON.stringify(failedRecords)}`);
+          
+          failedRecords.forEach(record => {
+            record.errors?.forEach(error => {
+              toast.error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) toast.error(record.message);
+          });
+        }
+
+        if (successfulRecords.length > 0) {
+          const attachment = successfulRecords[0].data;
+          return {
+            ...attachment,
+            id: attachment.Id,
+            name: attachment.Name,
+            taskId: attachment.task_id,
+            uploadedBy: attachment.uploaded_by
+          };
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error("Error creating attachment:", error);
+      throw error;
     }
-    attachments.push(newAttachment)
-    return { ...newAttachment }
   },
 
   async delete(id) {
-    await delay(200)
-    const index = attachments.findIndex(a => a.id === id)
-    if (index === -1) {
-      throw new Error('Attachment not found')
-    }
-    attachments.splice(index, 1)
-    return { success: true }
-  }
-}
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
 
-export default attachmentService
+      const params = {
+        RecordIds: [parseInt(id)]
+      };
+
+      const response = await apperClient.deleteRecord("Attachment1", params);
+
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return { success: false };
+      }
+
+      if (response.results) {
+        const successfulDeletions = response.results.filter(result => result.success);
+        const failedDeletions = response.results.filter(result => !result.success);
+
+        if (failedDeletions.length > 0) {
+          console.error(`Failed to delete ${failedDeletions.length} attachments:${JSON.stringify(failedDeletions)}`);
+          
+          failedDeletions.forEach(record => {
+            if (record.message) toast.error(record.message);
+          });
+        }
+
+        return { success: successfulDeletions.length > 0 };
+      }
+    } catch (error) {
+      console.error("Error deleting attachment:", error);
+      throw error;
+    }
+  }
+};
+
+export default attachmentService;
