@@ -9,6 +9,104 @@ const ProjectsList = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    members: '',
+    status: 'active',
+    tags: ''
+  });
+  const [formLoading, setFormLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+
+  useEffect(() => {
+    loadProjects();
+  }, []);
+
+  const loadProjects = async () => {
+    try {
+      setLoading(true);
+      const data = await projectService.getAll();
+      setProjects(data);
+    } catch (error) {
+      toast.error('Failed to load projects');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateProject = () => {
+    setShowCreateModal(true);
+    setFormData({
+      name: '',
+      description: '',
+      members: '',
+      status: 'active',
+      tags: ''
+    });
+    setFormErrors({});
+  };
+
+  const closeModal = () => {
+    setShowCreateModal(false);
+    setFormData({
+      name: '',
+      description: '',
+      members: '',
+      status: 'active',
+      tags: ''
+    });
+    setFormErrors({});
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (formErrors[name]) {
+      setFormErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.name.trim()) {
+      errors.name = 'Project name is required';
+    }
+    if (!formData.description.trim()) {
+      errors.description = 'Description is required';
+    }
+    if (!formData.members.trim()) {
+      errors.members = 'Members field is required';
+    }
+    return errors;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    setFormLoading(true);
+    try {
+      const result = await projectService.create(formData);
+      if (result) {
+        toast.success('Project created successfully!');
+        closeModal();
+        loadProjects(); // Refresh the projects list
+      }
+    } catch (error) {
+      toast.error('Failed to create project');
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const filteredProjects = projects.filter(project => {
 
   useEffect(() => {
     loadProjects();
@@ -71,8 +169,8 @@ const ProjectsList = () => {
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-medium text-gray-900">All Projects</h2>
-            <button 
-              onClick={() => toast.info('Project creation coming soon')}
+<button 
+              onClick={handleCreateProject}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
             >
               <Plus className="w-4 h-4" />
@@ -175,9 +273,147 @@ const ProjectsList = () => {
             </div>
           )}
         </div>
+</div>
       </div>
+
+      {/* Create Project Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">Create New Project</h2>
+              
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                    Project Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    disabled={formLoading}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      formErrors.name ? 'border-red-500' : 'border-gray-300'
+                    } ${formLoading ? 'bg-gray-100' : ''}`}
+                    placeholder="Enter project name"
+                  />
+                  {formErrors.name && (
+                    <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                    Description <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    id="description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    disabled={formLoading}
+                    rows={3}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      formErrors.description ? 'border-red-500' : 'border-gray-300'
+                    } ${formLoading ? 'bg-gray-100' : ''}`}
+                    placeholder="Enter project description"
+                  />
+                  {formErrors.description && (
+                    <p className="text-red-500 text-xs mt-1">{formErrors.description}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="members" className="block text-sm font-medium text-gray-700 mb-1">
+                    Members <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="members"
+                    name="members"
+                    value={formData.members}
+                    onChange={handleInputChange}
+                    disabled={formLoading}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      formErrors.members ? 'border-red-500' : 'border-gray-300'
+                    } ${formLoading ? 'bg-gray-100' : ''}`}
+                    placeholder="Enter project members"
+                  />
+                  {formErrors.members && (
+                    <p className="text-red-500 text-xs mt-1">{formErrors.members}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+                    Status
+                  </label>
+                  <select
+                    id="status"
+                    name="status"
+                    value={formData.status}
+                    onChange={handleInputChange}
+                    disabled={formLoading}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      formLoading ? 'bg-gray-100' : ''
+                    }`}
+                  >
+                    <option value="active">Active</option>
+                    <option value="planning">Planning</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-1">
+                    Tags
+                  </label>
+                  <input
+                    type="text"
+                    id="tags"
+                    name="tags"
+                    value={formData.tags}
+                    onChange={handleInputChange}
+                    disabled={formLoading}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      formLoading ? 'bg-gray-100' : ''
+                    }`}
+                    placeholder="Enter tags (optional)"
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    disabled={formLoading}
+                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={formLoading}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                  >
+                    {formLoading && (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    )}
+                    <span>{formLoading ? 'Creating...' : 'Create Project'}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
+};
+
+export default ProjectsList;
 };
 
 export default ProjectsList;
