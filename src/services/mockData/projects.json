@@ -1,0 +1,34 @@
+[
+  {
+    "id": "1",
+    "name": "Website Redesign",
+    "description": "Complete overhaul of the company website with modern design and improved user experience",
+    "members": ["John Smith", "Sarah Johnson", "Mike Chen", "Emily Davis"],
+    "createdAt": "2024-01-15T09:00:00Z",
+    "status": "active"
+  },
+  {
+    "id": "2",
+    "name": "Mobile App Development",
+    "description": "Native iOS and Android application for customer engagement and service delivery",
+    "members": ["Alex Rodriguez", "Lisa Wang", "David Brown"],
+    "createdAt": "2024-01-20T14:30:00Z",
+    "status": "active"
+  },
+  {
+    "id": "3",
+    "name": "Marketing Campaign Q2",
+    "description": "Comprehensive digital marketing strategy for second quarter product launch",
+    "members": ["Jennifer Lee", "Tom Wilson", "Grace Kim"],
+    "createdAt": "2024-02-01T11:15:00Z",
+    "status": "active"
+  },
+  {
+    "id": "4",
+    "name": "Infrastructure Upgrade",
+    "description": "Server migration and cloud infrastructure optimization for improved performance",
+    "members": ["Robert Johnson", "Michelle Zhang", "Carlos Martinez"],
+    "createdAt": "2024-02-10T16:45:00Z",
+    "status": "planning"
+  }
+]

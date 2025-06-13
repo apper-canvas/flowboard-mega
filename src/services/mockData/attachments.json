@@ -1,0 +1,34 @@
+[
+  {
+    "id": "1",
+    "taskId": "1",
+    "name": "homepage-wireframe.pdf",
+    "size": 2547680,
+    "type": "application/pdf",
+    "uploadedBy": "Sarah Johnson"
+  },
+  {
+    "id": "2",
+    "taskId": "3",
+    "name": "content-strategy.docx",
+    "size": 1834752,
+    "type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "uploadedBy": "Emily Davis"
+  },
+  {
+    "id": "3",
+    "taskId": "6",
+    "name": "social-media-calendar.xlsx",
+    "size": 892416,
+    "type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "uploadedBy": "Jennifer Lee"
+  },
+  {
+    "id": "4",
+    "taskId": "7",
+    "name": "email-template-preview.png",
+    "size": 567890,
+    "type": "image/png",
+    "uploadedBy": "Tom Wilson"
+  }
+]

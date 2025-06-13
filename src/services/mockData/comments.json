@@ -1,0 +1,30 @@
+[
+  {
+    "id": "1",
+    "taskId": "2",
+    "author": "John Smith",
+    "content": "Great progress on the setup! Make sure to include the testing framework configuration as well.",
+    "timestamp": "2024-03-08T10:30:00Z"
+  },
+  {
+    "id": "2",
+    "taskId": "2",
+    "author": "Mike Chen",
+    "content": "Thanks for the feedback! I'll add the testing setup to the documentation.",
+    "timestamp": "2024-03-08T14:15:00Z"
+  },
+  {
+    "id": "3",
+    "taskId": "4",
+    "author": "Lisa Wang",
+    "content": "The authentication flow looks solid. Have you considered adding two-factor authentication?",
+    "timestamp": "2024-03-09T09:45:00Z"
+  },
+  {
+    "id": "4",
+    "taskId": "7",
+    "author": "Grace Kim",
+    "content": "The email templates look fantastic! The color scheme matches our brand perfectly.",
+    "timestamp": "2024-03-10T11:20:00Z"
+  }
+]
