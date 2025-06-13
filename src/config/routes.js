@@ -48,6 +48,14 @@ export const routes = {
     path: '/settings',
     icon: 'Settings',
     component: Settings
+},
+  gantt: {
+    id: 'gantt',
+    label: 'Gantt Chart',
+    path: '/project/:projectId/gantt',
+    icon: 'Calendar',
+    component: ProjectBoard,
+    hidden: true
   }
 };
 
