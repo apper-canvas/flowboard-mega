@@ -106,30 +106,14 @@ const ProjectsList = () => {
     }
   };
 
-  const filteredProjects = projects.filter(project => {
-
-  useEffect(() => {
-    loadProjects();
-  }, []);
-
-  const loadProjects = async () => {
-    try {
-      setLoading(true);
-      const data = await projectService.getAll();
-      setProjects(data);
-    } catch (error) {
-      toast.error('Failed to load projects');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredProjects = projects.filter(project => {
+const filteredProjects = projects.filter(project => {
     const matchesSearch = project.Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          project.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  const getStatusBadge = (status) => {
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -412,8 +396,3 @@ const ProjectsList = () => {
     </div>
   );
 };
-
-export default ProjectsList;
-};
-
-export default ProjectsList;
