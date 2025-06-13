@@ -112,10 +112,8 @@ const filteredProjects = projects.filter(project => {
     const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
-});
 
   const getStatusBadge = (status) => {
-    switch (status) {
     switch (status) {
       case 'active':
         return <span className="px-2 py-1 text-xs font-medium text-green-600 bg-green-100 rounded-full">Active</span>;
