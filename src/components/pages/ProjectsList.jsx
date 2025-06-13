@@ -251,9 +251,9 @@ const filteredProjects = projects.filter(project => {
                     </div>
                   </div>
                 </div>
-              ))}
+))}
             </div>
-</div>
+          )}
           )}
         </div>
       </div>
