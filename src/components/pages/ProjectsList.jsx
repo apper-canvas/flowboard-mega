@@ -253,9 +253,9 @@ const filteredProjects = projects.filter(project => {
                 </div>
               ))}
             </div>
+</div>
           )}
         </div>
-</div>
       </div>
 
       {/* Create Project Modal */}
@@ -394,3 +394,5 @@ const filteredProjects = projects.filter(project => {
     </div>
   );
 };
+
+export default ProjectsList;
